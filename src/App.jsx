@@ -37,13 +37,8 @@ const Box = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  span {
-    &:hover {
-      font-size: 1rem;
-    }
-    &:active {
-      opacity: 1;
-    }
+  ${Emoji}:hover {
+    font-size: 5rem;
   }
 `;
 
@@ -51,8 +46,9 @@ function App() {
   return (
     <Wrapper>
       <Box>
-        <span>😍</span>
+        <Emoji>😍</Emoji>
       </Box>
+      <Emoji>🔥</Emoji>
     </Wrapper>
   );
 }
