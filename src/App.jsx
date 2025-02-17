@@ -1,48 +1,59 @@
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 
-const Father = styled.div`
+const Wrapper = styled.div`
   display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+  padding: 0;
+  margin: 0;
 `;
 
-const Btn = styled.button`
-  color: #fff;
-  background-color: tomato;
-  border: 0;
-  border-radius: 1rem;
+const animation = keyframes`
+  0% {
+    transform: rotate(0deg);
+    border-radius: 0;
+  }
+  50% {
+    transform: rotate(180deg);
+    border-radius: 10rem;
+  }
+  100% {
+    transform: rotate(360deg);
+    border-radius: 0;
+  }
+`;
+
+const Emoji = styled.span`
+  font-size: 3rem;
 `;
 
 const Box = styled.div`
-  width: 6rem;
-  height: 6rem;
-  background-color: ${(props) => props.bgColor};
-`;
-
-const Circle = styled(Box)`
-  width: 6rem;
-  height: 6rem;
-  background-color: ${(props) => props.bgColor};
-  border-radius: 3rem;
-`;
-
-const Link = styled(Btn)``;
-
-const Input = styled.input.attrs({ required: true })`
+  width: 10rem;
+  height: 10rem;
   background-color: tomato;
+  animation: ${animation} 5s linear infinite;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  span {
+    &:hover {
+      font-size: 1rem;
+    }
+    &:active {
+      opacity: 1;
+    }
+  }
 `;
 
 function App() {
   return (
-    <Father>
-      <Btn>로그인</Btn>
-      <Btn as="a" href="/">
-        로그인
-      </Btn>
-      <Input />
-      <Input />
-      <Input />
-      <Input />
-      <Input />
-    </Father>
+    <Wrapper>
+      <Box>
+        <span>😍</span>
+      </Box>
+    </Wrapper>
   );
 }
 
