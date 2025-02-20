@@ -68,9 +68,7 @@ function Coins() {
 
   useEffect(() => {
     (async function () {
-      const res = await fetch(
-        "https://proxy.cors.sh/https://api.coinpaprika.com/v1/coins"
-      );
+      const res = await fetch("https://api.coinpaprika.com/v1/coins");
       const json = await res.json();
       setCoins(json);
       setLoading(false);
@@ -85,19 +83,36 @@ function Coins() {
       {loading ? (
         <Loader>Loading...</Loader>
       ) : (
-        <CoinsList>
-          {coins.slice(page, page + 50).map((coin) => (
-            <Coin key={coin.id}>
-              <Img
-                src={`https://cryptoicon-api.pages.dev/api/icon/${coin.symbol.toLowerCase()}`}
-                alt={coin.symbol}
-              />
-              <Link to={`/${coin.id}`} state={{ name: coin.name }}>
-                {coin.name} &rarr;
-              </Link>
-            </Coin>
-          ))}
-        </CoinsList>
+        <>
+          <CoinsList>
+            {coins.slice(page, page + 50).map((coin) => (
+              <Coin key={coin.id}>
+                <Img
+                  src={`https://cryptoicon-api.pages.dev/api/icon/${coin.symbol
+                    .toLowerCase()
+                    .split(" ")
+                    .join("-")}`}
+                  alt={coin.symbol}
+                />
+                <Link to={`/${coin.id}`} state={{ name: coin.name }}>
+                  {coin.name} &rarr;
+                </Link>
+              </Coin>
+            ))}
+          </CoinsList>
+          <button
+            onClick={() => setPage((prev) => (prev >= 50 ? prev - 50 : prev))}
+          >
+            Prev
+          </button>
+          <button
+            onClick={() =>
+              setPage((prev) => (prev <= 48000 ? prev + 50 : prev))
+            }
+          >
+            Next
+          </button>
+        </>
       )}
     </Container>
   );
