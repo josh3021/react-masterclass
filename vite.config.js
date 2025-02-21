@@ -5,13 +5,4 @@ import { defineConfig } from "vite";
 export default defineConfig({
   plugins: [react()],
   base: "/react-masterclass/",
-  build: {
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          vendor: ["react", "react-dom"],
-        },
-      },
-    },
-  },
 });

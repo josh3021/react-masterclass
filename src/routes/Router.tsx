@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from "react-router";
+import { HashRouter, Route, Routes } from "react-router";
 import Chart from "./Chart";
 import Coin from "./Coin";
 import Coins from "./Coins";
@@ -6,7 +6,7 @@ import Price from "./Price";
 
 function Router() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Routes>
         <Route path="/" element={<Coins />} />
         <Route path="/:coinId/*" element={<Coin />}>
@@ -14,7 +14,7 @@ function Router() {
           <Route path="price" element={<Price />} />
         </Route>
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 
