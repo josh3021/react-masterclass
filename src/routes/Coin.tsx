@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { Helmet } from "react-helmet-async";
 import {
   Link,
   Location,
@@ -13,12 +14,21 @@ import { fetchInfoData, fetchPriceData } from "../api";
 // Styled Components
 const Container = styled.div`
   padding: 0px 20px;
-  max-width: 480px;
+  max-width: 45rem;
   margin: 0 auto;
 `;
 
 const Header = styled.header`
   height: 15vh;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  place-items: center;
+`;
+
+const HomeLink = styled(Link)`
+  width: 4rem;
+  height: 4rem;
+  border-radius: 2rem;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -26,6 +36,7 @@ const Header = styled.header`
 
 const Title = styled.h1`
   font-size: 48px;
+  font-weight: bold;
   color: ${({ theme }) => theme.accentColor};
 `;
 
@@ -62,6 +73,7 @@ const Description = styled.p`
 const TabsContainer = styled.div`
   display: grid;
   grid-template-columns: repeat(2, 1fr);
+  place-items: center;
   margin: 25px 0px;
   gap: 10px;
 `;
@@ -76,13 +88,12 @@ const Tab = styled.span<{ $isActive: boolean }>`
   border-radius: 10px;
   color: ${({ $isActive, theme }) =>
     $isActive ? theme.accentColor : theme.textColor};
-
+  width: 100%;
   a {
     display: block;
   }
 `;
 
-// Types
 type RouteParams = {
   coinId: string;
 };
@@ -164,19 +175,19 @@ const Overview = ({
         <span>${info.symbol}</span>
       </OverviewItem>
       <OverviewItem>
-        <span>Open Source</span>
-        <span>{info.open_source ? "Yes" : "No"}</span>
+        <span>Price:</span>
+        <span>${ticker.quotes.USD.price.toLocaleString("ko-KR")}</span>
       </OverviewItem>
     </OverviewContainer>
     <Description>{info.description}</Description>
     <OverviewContainer>
       <OverviewItem>
         <span>Total Supply</span>
-        <span>{ticker.total_supply}</span>
+        <span>{ticker.total_supply.toLocaleString("ko-KR")}</span>
       </OverviewItem>
       <OverviewItem>
         <span>Max Supply</span>
-        <span>{ticker.max_supply}</span>
+        <span>{ticker.max_supply.toLocaleString("ko-KR")}</span>
       </OverviewItem>
     </OverviewContainer>
   </>
@@ -220,7 +231,29 @@ function Coin() {
 
   return (
     <Container>
+      <Helmet>
+        <title>
+          {state?.name ?? (isInfoPending ? "Loading..." : info?.name)}
+        </title>
+      </Helmet>
       <Header>
+        <HomeLink to="/">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            width="2rem"
+            height="2rem"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"
+            />
+          </svg>
+        </HomeLink>
         <Title>
           {state?.name ?? (isInfoPending ? "Loading..." : info?.name)}
         </Title>

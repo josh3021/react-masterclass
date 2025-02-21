@@ -1,11 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
+import { Helmet } from "react-helmet-async";
 import { Link } from "react-router";
 import styled from "styled-components";
 import { fetchCoins } from "../api";
 
 const Container = styled.div`
   padding: 0 1rem;
-  max-width: 30rem;
+  max-width: 45rem;
   margin: 0 auto;
 `;
 
@@ -17,9 +18,10 @@ const Header = styled.header`
 `;
 
 const CoinsList = styled.ul``;
+
 const Coin = styled.li`
-  background-color: white;
-  color: ${(props) => props.theme.bgColor};
+  background-color: ${(props) => props.theme.boxColor};
+  color: ${(props) => props.theme.textColor};
   border-radius: 1rem;
   margin-bottom: 1rem;
   display: flex;
@@ -72,6 +74,9 @@ function Coins() {
   if (error) return "An Error has occurred " + error.message;
   return (
     <Container>
+      <Helmet>
+        <title>코인</title>
+      </Helmet>
       <Header>
         <Title>코인</Title>
       </Header>
