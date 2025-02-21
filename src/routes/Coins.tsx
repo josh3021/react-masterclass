@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router";
 import styled from "styled-components";
+import { fetchCoins } from "../api";
 
 const Container = styled.div`
   padding: 0 1rem;
@@ -51,7 +52,7 @@ const Title = styled.h1`
   color: ${(props) => props.theme.accentColor};
 `;
 
-interface ICoin {
+export interface ICoin {
   id: string;
   name: string;
   symbol: string;
@@ -62,30 +63,24 @@ interface ICoin {
 }
 
 function Coins() {
-  const [coins, setCoins] = useState<ICoin[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(0);
+  const { isPending, error, data } = useQuery({
+    queryKey: ["allCoins"],
+    queryFn: fetchCoins,
+  });
+  // const [page, setPage] = useState(0);
 
-  useEffect(() => {
-    (async function () {
-      const res = await fetch("https://api.coinpaprika.com/v1/coins");
-      const json = await res.json();
-      setCoins(json);
-      setLoading(false);
-    })();
-  }, []);
-
+  if (error) return "An Error has occurred " + error.message;
   return (
     <Container>
       <Header>
         <Title>코인</Title>
       </Header>
-      {loading ? (
+      {isPending ? (
         <Loader>Loading...</Loader>
       ) : (
         <>
           <CoinsList>
-            {coins.slice(page, page + 50).map((coin) => (
+            {data?.slice(0, 50).map((coin) => (
               <Coin key={coin.id}>
                 <Img
                   src={`https://cryptoicon-api.pages.dev/api/icon/${coin.symbol
@@ -100,7 +95,7 @@ function Coins() {
               </Coin>
             ))}
           </CoinsList>
-          <button
+          {/* <button
             onClick={() => setPage((prev) => (prev >= 50 ? prev - 50 : prev))}
           >
             Prev
@@ -111,7 +106,7 @@ function Coins() {
             }
           >
             Next
-          </button>
+          </button> */}
         </>
       )}
     </Container>

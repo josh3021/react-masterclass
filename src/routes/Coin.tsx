@@ -1,25 +1,16 @@
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import {
   Link,
   Location,
   Outlet,
-  PathMatch,
   useLocation,
   useMatch,
   useParams,
 } from "react-router";
 import styled from "styled-components";
+import { fetchInfoData, fetchPriceData } from "../api";
 
-const Title = styled.h1`
-  font-size: 48px;
-  color: ${(props) => props.theme.accentColor};
-`;
-
-const Loader = styled.span`
-  text-align: center;
-  display: block;
-`;
-
+// Styled Components
 const Container = styled.div`
   padding: 0px 20px;
   max-width: 480px;
@@ -33,7 +24,17 @@ const Header = styled.header`
   align-items: center;
 `;
 
-const Overview = styled.div`
+const Title = styled.h1`
+  font-size: 48px;
+  color: ${({ theme }) => theme.accentColor};
+`;
+
+const Loader = styled.span`
+  text-align: center;
+  display: block;
+`;
+
+const OverviewContainer = styled.div`
   display: flex;
   justify-content: space-between;
   background-color: rgba(0, 0, 0, 0.5);
@@ -53,17 +54,19 @@ const OverviewItem = styled.div`
     margin-bottom: 5px;
   }
 `;
+
 const Description = styled.p`
   margin: 20px 0px;
 `;
-const Tabs = styled.div`
+
+const TabsContainer = styled.div`
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   margin: 25px 0px;
   gap: 10px;
 `;
 
-const Tab = styled.span<{ $isActive: string }>`
+const Tab = styled.span<{ $isActive: boolean }>`
   text-align: center;
   text-transform: uppercase;
   font-size: 12px;
@@ -71,13 +74,15 @@ const Tab = styled.span<{ $isActive: string }>`
   background-color: rgba(0, 0, 0, 0.5);
   padding: 7px 0px;
   border-radius: 10px;
-  color: ${(props) =>
-    props.$isActive ? props.theme.accentColor : props.theme.textColor};
+  color: ${({ $isActive, theme }) =>
+    $isActive ? theme.accentColor : theme.textColor};
+
   a {
     display: block;
   }
 `;
 
+// Types
 type RouteParams = {
   coinId: string;
 };
@@ -86,7 +91,7 @@ interface RouteState {
   name?: string;
 }
 
-interface InfoData {
+export interface IInfoData {
   id: string;
   name: string;
   symbol: string;
@@ -107,7 +112,7 @@ interface InfoData {
   last_data_at: string;
 }
 
-interface PriceData {
+export interface IPriceData {
   id: string;
   name: string;
   symbol: string;
@@ -140,80 +145,97 @@ interface PriceData {
     };
   };
 }
+// Components
+const Overview = ({
+  info,
+  ticker,
+}: {
+  info: IInfoData;
+  ticker: IPriceData;
+}) => (
+  <>
+    <OverviewContainer>
+      <OverviewItem>
+        <span>Rank</span>
+        <span>{info.rank}</span>
+      </OverviewItem>
+      <OverviewItem>
+        <span>Symbol</span>
+        <span>${info.symbol}</span>
+      </OverviewItem>
+      <OverviewItem>
+        <span>Open Source</span>
+        <span>{info.open_source ? "Yes" : "No"}</span>
+      </OverviewItem>
+    </OverviewContainer>
+    <Description>{info.description}</Description>
+    <OverviewContainer>
+      <OverviewItem>
+        <span>Total Supply</span>
+        <span>{ticker.total_supply}</span>
+      </OverviewItem>
+      <OverviewItem>
+        <span>Max Supply</span>
+        <span>{ticker.max_supply}</span>
+      </OverviewItem>
+    </OverviewContainer>
+  </>
+);
 
+const Tabs = ({ coinId }: { coinId: string }) => {
+  const priceMatch = useMatch("/:coinId/price");
+  const chartMatch = useMatch("/:coinId/chart");
+
+  return (
+    <TabsContainer>
+      <Tab $isActive={chartMatch !== null}>
+        <Link to={`/${coinId}/chart`}>Chart</Link>
+      </Tab>
+      <Tab $isActive={priceMatch !== null}>
+        <Link to={`/${coinId}/price`}>Price</Link>
+      </Tab>
+    </TabsContainer>
+  );
+};
+
+// Main Component
 function Coin() {
-  const [loading, setLoading] = useState(true);
   const { coinId } = useParams<RouteParams>();
   const { state }: Location<RouteState> = useLocation();
-  const [info, setInfo] = useState<InfoData>();
-  const [priceInfo, setPriceInfo] = useState<PriceData>();
 
-  const priceMatch: PathMatch<"coinId"> | null = useMatch("/:coinId/price");
-  const chartMatch: PathMatch<"coinId"> | null = useMatch("/:coinId/chart");
-  useEffect(() => {
-    (async () => {
-      const [infoData, priceData] = await Promise.all<
-        [Promise<InfoData>, Promise<PriceData>]
-      >([
-        (await fetch(`https://api.coinpaprika.com/v1/coins/${coinId}`)).json(),
-        (
-          await fetch(`https://api.coinpaprika.com/v1/tickers/${coinId}`)
-        ).json(),
-      ]);
-      setInfo(infoData);
-      setPriceInfo(priceData);
-      setLoading(false);
-    })();
-  }, [coinId]);
+  const { isPending: isInfoPending, data: info } = useQuery({
+    queryKey: ["info", coinId],
+    queryFn: () => fetchInfoData(coinId),
+    enabled: !!coinId,
+  });
+
+  const { isPending: isTickerPending, data: ticker } = useQuery({
+    queryKey: ["ticker", coinId],
+    queryFn: () => fetchPriceData(coinId),
+    enabled: !!coinId,
+  });
+
+  const isLoading = isInfoPending || isTickerPending;
+  const hasData = info && ticker;
 
   return (
     <Container>
       <Header>
         <Title>
-          {state?.name ? state.name : loading ? "Loading..." : info?.name}
+          {state?.name ?? (isInfoPending ? "Loading..." : info?.name)}
         </Title>
       </Header>
-      {loading ? (
+      {isLoading ? (
         <Loader>Loading...</Loader>
-      ) : (
+      ) : hasData ? (
         <>
-          <Overview>
-            <OverviewItem>
-              <span>Rank:</span>
-              <span>{info?.rank}</span>
-            </OverviewItem>
-            <OverviewItem>
-              <span>Symbol:</span>
-              <span>${info?.symbol}</span>
-            </OverviewItem>
-            <OverviewItem>
-              <span>Open Source:</span>
-              <span>{info?.open_source ? "Yes" : "No"}</span>
-            </OverviewItem>
-          </Overview>
-          <Description>{info?.description}</Description>
-          <Overview>
-            <OverviewItem>
-              <span>Total Suply:</span>
-              <span>{priceInfo?.total_supply}</span>
-            </OverviewItem>
-            <OverviewItem>
-              <span>Max Supply:</span>
-              <span>{priceInfo?.max_supply}</span>
-            </OverviewItem>
-          </Overview>
-          <Tabs>
-            <Tab $isActive={`${chartMatch !== null}`}>
-              <Link to={`/${coinId}/chart`}>Chart</Link>
-            </Tab>
-            <Tab $isActive={`${priceMatch !== null}`}>
-              <Link to={`/${coinId}/price`}>Price</Link>
-            </Tab>
-          </Tabs>
+          <Overview info={info} ticker={ticker} />
+          <Tabs coinId={coinId!} />
           <Outlet />
         </>
-      )}
+      ) : null}
     </Container>
   );
 }
+
 export default Coin;
