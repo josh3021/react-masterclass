@@ -5,6 +5,7 @@ export const darkTheme: DefaultTheme = {
   textColor: "#f5f6fa",
   accentColor: "#4cd137",
   boxColor: "#323232",
+  hoverColor: "#1e272e",
 };
 
 export const lightTheme: DefaultTheme = {
@@ -12,4 +13,5 @@ export const lightTheme: DefaultTheme = {
   textColor: "#010101",
   accentColor: "#4cd137",
   boxColor: "#dfe4ea",
+  hoverColor: "#bdc3c7",
 };

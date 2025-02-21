@@ -68,12 +68,17 @@ const ThemeToggleBtn = styled.button`
   position: absolute;
   bottom: 1rem;
   right: 1rem;
-  width: 4rem;
-  height: 4rem;
+  width: 3rem;
+  height: 3rem;
   border-radius: 100%;
   background-color: ${(props) => props.theme.bgColor};
   color: ${(props) => props.theme.accentColor};
-  border: 1px solid #232323;
+  border: 4px solid ${(props) => props.theme.accentColor};
+  cursor: pointer;
+  transition: color background-color ease-in-out 1s;
+  &:hover {
+    background-color: ${(props) => props.theme.hoverColor};
+  }
 `;
 
 function App() {
