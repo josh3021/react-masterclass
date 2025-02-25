@@ -2,8 +2,8 @@ import styled, { createGlobalStyle, ThemeProvider } from "styled-components";
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
 import { useShallow } from "zustand/shallow";
+import ToDoList from "./components/ToDoList";
 import { darkTheme, lightTheme } from "./theme";
-import ToDoList from "./ToDoList";
 
 const GlobalStyle = createGlobalStyle`
   html, body, div, span, applet, object, iframe,
