@@ -21,7 +21,8 @@
     "react-dom": "^18.0.0",
     "react-helmet-async": "^2.0.5",
     "react-router": "^7.2.0",
-    "styled-components": "^6.1.15"
+    "styled-components": "^6.1.15",
+    "zustand": "^5.0.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.20.0",

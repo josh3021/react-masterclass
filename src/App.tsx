@@ -1,5 +1,7 @@
-import { useState } from "react";
 import styled, { createGlobalStyle, ThemeProvider } from "styled-components";
+import { create } from "zustand";
+import { devtools, persist } from "zustand/middleware";
+import { useShallow } from "zustand/shallow";
 import Router from "./routes/Router";
 import { darkTheme, lightTheme } from "./theme";
 
@@ -81,18 +83,37 @@ const ThemeToggleBtn = styled.button`
   }
 `;
 
-function App() {
-  const [isDarkMode, setIsDarkMode] = useState(true);
+interface IThemeState {
+  isDarkMode: boolean;
+  toggleDarkMode: () => void;
+}
 
-  const toggleTheme = () => {
-    setIsDarkMode((p) => !p);
-  };
+const useThemeStore = create<IThemeState>()(
+  devtools(
+    persist(
+      (set) => ({
+        isDarkMode: false,
+        toggleDarkMode: () =>
+          set((state) => ({ isDarkMode: !state.isDarkMode })),
+      }),
+      {
+        name: "theme-storage",
+      }
+    )
+  )
+);
+
+function App() {
+  const [isDarkMode, toggleDarkMode] = useThemeStore(
+    useShallow((state) => [state.isDarkMode, state.toggleDarkMode])
+  );
+
   return (
     <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}>
       <GlobalStyle />
       <Router />
       {/* <ReactQueryDevtools initialIsOpen={true} /> */}
-      <ThemeToggleBtn onClick={toggleTheme}>
+      <ThemeToggleBtn onClick={toggleDarkMode}>
         {isDarkMode ? (
           <svg
             xmlns="http://www.w3.org/2000/svg"
